@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://evangipson.com/jaffle/css/all.css" />
+    <title>Jaffle</title>
+    <style>
+        html, body {
+            font-family: sans-serif;
+        }
+        body {
+            max-width: 800px;
+            margin: 1rem auto 0;
+            padding: 0 2rem;
+        }
+        h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .header {
+            text-align: center;
+        }
+        .subtitle {
+            margin-top: 0;
+            color: grey;
+        }
+        .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .content-left, .content-right {
+            padding: 1rem;
+            box-sizing: border-box;
+            min-width: 350px;
+            box-shadow: 2px 2px 8px 2px rgba(0,0,0,.15);
+        }
+        .content-right {
+            margin-top: 1.5rem;
+        }
+        .content-left button {
+            margin: 1rem auto 0;
+            display: block;
+        }
+        .delete-jaffler {
+            cursor: pointer;
+        }
+        .display-jaffler {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .list-jafflers {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .jaffler-amount {
+            background: transparent;
+            outline: none;
+            border: none;
+            width: 60px;
+        }
+        .jaffle-button-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin-top: 2rem;
+        }
+        .jaffle-button {
+            padding: 0.5rem 1.75rem;
+            background-color: gainsboro;
+            outline: none;
+            border: 2px #ccc solid;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+            font-size: 18px;
+        }
+        .jaffle-button.small {
+            padding: 0.25rem 1rem;
+            background-color: gainsboro;
+            outline: none;
+            border: 2px #ccc solid;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+            font-size: 14px;
+        }
+        .jaffle-button:hover {
+            background-color: #ccc;
+            border: 2px #bbb solid;
+        }
+        .jaffle-winner {
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .jaffle-winner p {
+            margin: 2rem auto 1rem;
+        }
+        .jaffle-winner .winner {
+            margin-top: 0;
+        }
+        .form-input {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        .form-input:first-child {
+            margin-top: 0;
+        }
+        input {
+            padding: 0.15rem 0.33rem 0.15rem 0;
+            font-size: 16px;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            outline: none;
+        }
+        .jaffle-button.clear {
+            margin-top: 2rem;
+        }
+        .not-the-winner {
+            color: #ddd;
+        }
+        /* desktop styles */
+        @media screen and (min-width:850px) {
+            .content {
+                justify-content: space-evenly;
+                align-items: flex-start;
+                flex-direction: row;
+            }
+            .content-right {
+                margin-top: 0;
+            }
+            .jaffle-button-wrapper {
+                align-items: center;
+                justify-content: space-evenly;
+                flex-direction: row;
+            }
+            .jaffle-button.clear {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="header">
+        <h1>Jaffle</h1>
+        <p class="subtitle"><i>(<b>ja</b>vascript ra<b>ffle</b>)</i></p>
+        <p>rule: if you add a person with the same name, that raffle amount is applied to their total.</p>
+        <p>rule: must fill out both person name and jaffle tickets to add jaffler to jaffle.</p>
+    </section>
+    <section class="content">
+        <div class="content-left">
+            <h2>Add Jafflers</h2>
+            <div class='form-input'>
+                <label for="personName">Person Name</label>
+                <input type="text" maxlength="25" name="personName" id="personName" />
+            </div>
+            <div class='form-input'>
+                <label for="raffleTickets">Jaffle Tickets</label>
+                <input type="number" name="raffleTickets" id="raffleTickets" />
+            </div>
+            <button class="jaffle-button small" id="addPerson">Add Person</button>
+        </div>
+        <div class="content-right">
+            <h2>Current Jafflers</h2>
+            <ul class="list-jafflers" id="currentList">None</ul>
+        </div>
+    </section>
+    <section class="jaffle-button-wrapper">
+        <button class="jaffle-button" id="jaffle">Find Winner</button>
+        <button class="jaffle-button clear" id="clearJafflers">Reset Jaffle</button>
+    </section>
+    <section class="jaffle-winner" id="jaffleWinner"></section>
+    <script>
+        "use strict";
+        // local "state" of the application
+        let jafflers = [];
+        // utility functions
+        const getRandomArrayElement = (array) => array[Math.floor(Math.random() * array.length)];
+        /**
+        * Shuffles array in place. ES6 version
+        * @param {Array} a items An array containing the items.
+        */
+        function shuffle(a) {
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+        // wait until the page actually loads to do script-y things
+        document.addEventListener("DOMContentLoaded", function(e) {
+            // grab all HTML elements
+            let currentListElement = document.getElementById("currentList");
+            let addPersonButton = document.getElementById("addPerson");
+            let personNameInput = document.getElementById("personName");
+            let raffleAmountInput = document.getElementById("raffleTickets");
+            let jaffleButton = document.getElementById("jaffle");
+            let clearJafflersButton = document.getElementById("clearJafflers");
+            let raffleInputs = document.getElementsByClassName("jaffler-amount");
+            let trashInputs = document.getElementsByClassName("delete-jaffler");
+            let totalJafflerPool = [];
+            // define the functions we'll use
+            const disableAllInputs = () => {
+                addPersonButton.disabled = true;
+                personNameInput.disabled = true;
+                raffleAmountInput.disabled = true;
+                jaffleButton.disabled = true;
+                clearJafflersButton.disabled = true;
+                for(let i = 0; i < raffleInputs.length; i++) {
+                    raffleInputs[i].disabled = true;
+                }
+                for(let i = 0; i < trashInputs.length; i++) {
+                    trashInputs[i].classList = "delete-jaffler";
+                }
+            }
+            const enableAllInputs = () => {
+                addPersonButton.disabled = false;
+                personNameInput.disabled = false;
+                raffleAmountInput.disabled = false;
+                jaffleButton.disabled = false;
+                clearJafflersButton.disabled = false;
+                for(let i = 0; i < raffleInputs.length; i++) {
+                    raffleInputs[i].disabled = false;
+                }
+                for(let i = 0; i < trashInputs.length; i++) {
+                    trashInputs[i].classList = "fas fa-trash delete-jaffler";
+                }
+            }
+            const runJaffle = () => {
+                for(let jaffler in jafflers) {
+                    for(let tickets = 0; tickets < jafflers[jaffler].raffleAmount; tickets++) {
+                        totalJafflerPool.push(jafflers[jaffler].personName);
+                    }
+                }
+                // scramble up the array multiple times
+                shuffle(totalJafflerPool);
+                shuffle(totalJafflerPool);
+                shuffle(totalJafflerPool);
+                return getRandomArrayElement(totalJafflerPool);
+            }
+            const pickWinner = async () => {
+                let jaffleWinnerElement = document.getElementById("jaffleWinner");
+                if(jafflers.length != 0) {
+                    // disable all inputs while we wait
+                    disableAllInputs();
+                    // calculate winner first to fill up totalJafflerPool
+                    const winner = runJaffle();
+                    /* now that totalJafflerPool is filled, we can
+                    * cycle through all contestants to let user know raffle is working */
+                    let uniqueJafflers = Array.from(new Set(totalJafflerPool));
+                    for(let i = 0; i < (Math.floor(Math.random() * 100) + 30); i++) {
+                        let name = getRandomArrayElement(uniqueJafflers);
+                        jaffleWinnerElement.innerHTML = `<p>The winner is...</p><p class="winner not-the-winner">${name}</p>`;
+                        await new Promise(resolve => setTimeout(resolve, Math.floor((Math.random() * i) + 150)));
+                    }
+                    jaffleWinnerElement.innerHTML = `<p><i class="fas fa-birthday-cake"></i>The winner is...<i class="fas fa-birthday-cake"></i></p><p class="winner"><i class="fas fa-birthday-cake"></i>${winner}!<i class="fas fa-birthday-cake"></i></p>`;
+                    // enable all inputs again
+                    enableAllInputs();
+                }
+                else {
+                    jaffleWinnerElement.innerHTML = `<p style='font-size:22px'>Please add jafflers to win.</p>`;
+                }
+            }
+            const updateJafflerDisplay = () => {
+                // clear out any previous input
+                currentListElement.innerHTML = "";
+                // redraw the list
+                for(let jaffler in jafflers) {
+                    let personNameText = document.createElement("span");
+                    personNameText.innerHTML = `<i class="fas fa-user" style="margin-right:0.5rem;" aria-hidden="true"></i><span>${jafflers[jaffler].personName}</span>`;
+                    let raffleWrapperDiv = document.createElement("div");
+                    let raffleLabel = document.createElement("label");
+                    raffleLabel.innerHTML = `<i class="fas fa-ticket-alt" style="margin-right:0.5rem;" aria-hidden="true"></i>`;
+                    raffleLabel.for = "jafflerAmount";
+                    let raffleElement = document.createElement("input");
+                    raffleElement.type = "number";
+                    raffleElement.name = "jaffleAmount";
+                    raffleElement.classList = "jaffler-amount";
+                    // step 4: define change behavior of rafflerAmount input
+                    raffleElement.addEventListener("change", (event) => {
+                        // note: this actually UPDATES the jafflers on the spot
+                        let targetJaffler = jafflers.find(element => element.personName == event.target.parentNode.parentNode.children[0].innerText);
+                        targetJaffler.raffleAmount = event.target.value;
+                    })
+                    raffleElement.value = jafflers[jaffler].raffleAmount;
+                    let deleteJafflerElement = document.createElement("i");
+                    deleteJafflerElement.classList = "fas fa-trash delete-jaffler";
+                    // step 5: define click behavior of trashcan
+                    deleteJafflerElement.addEventListener("click", (event) => {
+                        // actually delete the jaffler from our array
+                        jafflers = jafflers.filter(element => element.personName != event.target.parentNode.children[0].innerText);
+                        // wipe out the list
+                        if(jafflers.length === 0) {
+                            // click reset button
+                            clearJafflersButton.click();
+                        }
+                        // if we actually have jafflers to remove, do it
+                        else {
+                            // go up two parents, delete parent + children
+                            delete event.target.parentNode.parentNode.removeChild(event.target.parentNode);
+                        }
+                    })
+                    // create raffle wrapped element
+                    raffleWrapperDiv.appendChild(raffleLabel);
+                    raffleWrapperDiv.appendChild(raffleElement);
+                    // create wrapper list element
+                    let listElement = document.createElement("li");
+                    listElement.classList = "display-jaffler"
+                    listElement.appendChild(personNameText);
+                    listElement.appendChild(raffleWrapperDiv);
+                    listElement.appendChild(deleteJafflerElement);
+                    // attach to list
+                    currentListElement.appendChild(listElement);
+                }
+                return false;
+            }
+            addPersonButton.addEventListener("click", (event) => {
+                event.preventDefault();
+                // step 0: if person name is blank, don't do anything
+                if(!personNameInput.value || !raffleAmountInput.value) {
+                    return;
+                }
+                // step 1: retrieve inputs data
+                const personName = personNameInput.value;
+                const raffleAmount = raffleAmountInput.value;
+                // step 1.5: check for duplicate jaffler
+                let duplicateJaffler = jafflers.find(element => element.personName === personName);
+                if(duplicateJaffler) {
+                    // add the raffler amount and discard
+                    duplicateJaffler.raffleAmount = parseInt(duplicateJaffler.raffleAmount) + parseInt(raffleAmount);
+                    updateJafflerDisplay();
+                    // blow out old input data
+                    personNameInput.value = "";
+                    raffleAmountInput.value = "";
+                    return;
+                }
+                // step 2: create our local jaffler
+                const localJaffler = {
+                    personName: personName,
+                    raffleAmount: raffleAmount
+                }
+                jafflers.push(localJaffler);
+                // step 3: display the information
+                updateJafflerDisplay();
+                // step 4: blow out old input data
+                personNameInput.value = "";
+                raffleAmountInput.value = "";
+            });
+            jaffleButton.addEventListener("click", async () => {
+                await pickWinner();
+            });
+            clearJafflersButton.addEventListener("click", () => {
+                // remove current jafflers from system
+                jafflers = [];
+                updateJafflerDisplay();
+                // reset the current jaffler text
+                currentListElement.innerText = "None";
+            });
+            // write up the enter button
+            document.addEventListener("keyup", async(e) => {
+                // if we aren't calculating totals, and it's the enter key, lets pick a winner
+                if(!jaffleButton.disabled && e.keyCode === 13){
+                    e.preventDefault();
+                    await pickWinner();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
