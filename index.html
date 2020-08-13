@@ -295,6 +295,9 @@
                 }
             }
             const runJaffle = () => {
+                // reset any existing jaffler pool
+                totalJafflerPool = [];
+                // fill up the ticket pool
                 for(let jaffler in jafflers) {
                     for(let tickets = 0; tickets < jafflers[jaffler].raffleAmount; tickets++) {
                         totalJafflerPool.push(jafflers[jaffler].personName);
@@ -304,6 +307,8 @@
                 shuffle(totalJafflerPool);
                 shuffle(totalJafflerPool);
                 shuffle(totalJafflerPool);
+                console.info("Total Ticket Pool");
+                console.info(totalJafflerPool);
                 return getRandomArrayElement(totalJafflerPool);
             }
             const pickWinner = async () => {
