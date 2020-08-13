@@ -6,46 +6,92 @@
     <link rel="stylesheet" href="https://evangipson.com/jaffle/css/all.css" />
     <title>Jaffle</title>
     <style>
+        /* This is CSS3 Variables! */
+        :root {
+            --color: #82acdf;
+            --color-dark: #6699d6;
+            --color-darker: #5480b4;
+            --dark: #4E4E4E;
+            --light: #F2F2F2;
+            --light-dark: #dadada;
+            --light-darker: #b9b9b9;
+        }
         html, body {
             font-family: sans-serif;
-        }
-        body {
-            max-width: 800px;
-            margin: 1rem auto 0;
-            padding: 0 2rem;
-        }
-        h1 {
-            font-size: 48px;
             margin: 0;
         }
+        h1 {
+            font-size: 128px;
+            line-height: 128px;
+            margin: 0;
+            padding: 0;
+        }
         h2 {
-            margin-top: 0;
+            color: var(--color-dark);
+            font-size: 38px;
+            margin: 0;
+        }
+        .list-jafflers, .jaffle-button, label, input, p {
+            font-size: 24px;
+        }
+        /* CSS group for setting background/font */
+        body, html, input, button {
+            background-color: var(--color);
+            color: var(--light);
+        }
+        body, html, input, button, label {
+            font-weight: bold;
         }
         .header {
             text-align: center;
+            padding-top: 1rem;
+            padding-bottom: 0;
+            margin: 1rem auto 0;
         }
-        .subtitle {
-            margin-top: 0;
-            color: grey;
+        .content, .header, .jaffle-button-wrapper {
+            max-width: 900px;
         }
         .content {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             flex-direction: column;
+            margin: 2rem auto 0;
+            padding: 0 2rem;
         }
         .content-left, .content-right {
-            padding: 1rem;
-            box-sizing: border-box;
-            min-width: 350px;
-            box-shadow: 2px 2px 8px 2px rgba(0,0,0,.15);
+            padding: 2rem 2rem 3rem;
+            width: 300px;
+        }
+        .neumorphic, .neumorphic-inset, .neumorphic-mix {
+            border-radius: 45px;
+        }
+        .neumorphic {
+            box-shadow: 12px 12px 16px 0 rgba(0, 0, 0, 0.15),
+                        -8px -8px 12px 0 rgba(255, 255, 255, 0.18);
+        }
+        .neumorphic-inset {
+            box-shadow: inset 6px 6px 10px 0 rgba(0, 0, 0, 0.2),
+                        inset -6px -6px 10px 0 rgba(255, 255, 255, 0.25);
+        }
+        .neumorphic-concave {
+            background: linear-gradient(135deg, rgba(0,0,0,0.12), rgba(255,255,255,0.18));
+        }
+        .neumorphic-convex {
+            background: linear-gradient(-45deg, rgba(0,0,0,0.12), rgba(255,255,255,0.18));
+        }
+        .neumorphic-mix {
+            box-shadow: inset 12px 12px 16px 0 rgba(0, 0, 0, 0.15),
+                        6px 6px 10px 0 rgba(255, 255, 255, 0.35);
+        }
+        .content-left {
+            margin: 0 1rem;
         }
         .content-right {
             margin-top: 1.5rem;
         }
-        .content-left button {
-            margin: 1rem auto 0;
-            display: block;
+        .content-right span, .jaffler-amount {
+            font-size: 18px;
         }
         .delete-jaffler {
             cursor: pointer;
@@ -64,38 +110,30 @@
             background: transparent;
             outline: none;
             border: none;
-            width: 60px;
+            width: 50px;
         }
         .jaffle-button-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            margin-top: 2rem;
         }
         .jaffle-button {
-            padding: 0.5rem 1.75rem;
-            background-color: gainsboro;
+            padding: 1rem 2rem;
+            margin-top: 2rem;
+            background-color: transparent;
             outline: none;
-            border: 2px #ccc solid;
+            border: none;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.2s ease;
-            font-size: 18px;
-        }
-        .jaffle-button.small {
-            padding: 0.25rem 1rem;
-            background-color: gainsboro;
-            outline: none;
-            border: 2px #ccc solid;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.2s ease;
-            font-size: 14px;
+            box-sizing: border-box;
+            border-radius: 25px;
+            transition: background-color 0.35s ease;
         }
         .jaffle-button:hover {
-            background-color: #ccc;
-            border: 2px #bbb solid;
+            background-color: var(--color-dark);
+        }
+        .jaffle-button:active {
+            background-color: var(--color-darker);
         }
         .jaffle-winner {
             font-size: 36px;
@@ -121,20 +159,47 @@
         }
         input {
             padding: 0.15rem 0.33rem 0.15rem 0;
-            font-size: 16px;
             border-top: none;
             border-left: none;
             border-right: none;
+            border-bottom: 1px var(--color-darker) solid;
+            border-radius: 0;
+            background-color: transparent;
             outline: none;
+            width: 100%;
         }
-        .jaffle-button.clear {
-            margin-top: 2rem;
+        i {
+            color: var(--color-dark)!important;
+        }
+        label {
+            margin-right: 1rem;
+            position: relative;
         }
         .not-the-winner {
-            color: #ddd;
+            color: var(--color-dark);
+        }
+        /* force the jafflers to line up */
+        li.display-jaffler span {
+            min-width: 185px;
+        }
+        .no-right-margin {
+            margin-right: 0;
         }
         /* desktop styles */
         @media screen and (min-width:850px) {
+            h1 {
+                font-size: 164px;
+                line-height: 140px;
+            }
+            .jaffle-button-wrapper {
+                flex-direction: row;
+                justify-content: center;
+                align-items: flex-start;
+                margin: 1rem auto 0;
+            }
+            .jaffle-button {
+                margin-right: 1.5rem;
+            }
             .content {
                 justify-content: space-evenly;
                 align-items: flex-start;
@@ -143,45 +208,34 @@
             .content-right {
                 margin-top: 0;
             }
-            .jaffle-button-wrapper {
-                align-items: center;
-                justify-content: space-evenly;
-                flex-direction: row;
-            }
-            .jaffle-button.clear {
-                margin-top: 0;
-            }
         }
     </style>
 </head>
 <body>
     <section class="header">
         <h1>Jaffle</h1>
-        <p class="subtitle"><i>(<b>ja</b>vascript ra<b>ffle</b>)</i></p>
-        <p>rule: if you add a person with the same name, that raffle amount is applied to their total.</p>
-        <p>rule: must fill out both person name and jaffle tickets to add jaffler to jaffle.</p>
     </section>
     <section class="content">
-        <div class="content-left">
-            <h2>Add Jafflers</h2>
+        <div class="neumorphic content-left">
+            <h2>Add</h2>
             <div class='form-input'>
-                <label for="personName">Person Name</label>
-                <input type="text" maxlength="25" name="personName" id="personName" />
+                <label for="personName">Name</label>
+                <input type="text" maxlength="15" name="personName" id="personName" />
             </div>
             <div class='form-input'>
-                <label for="raffleTickets">Jaffle Tickets</label>
+                <label for="raffleTickets">Tickets</label>
                 <input type="number" name="raffleTickets" id="raffleTickets" />
             </div>
-            <button class="jaffle-button small" id="addPerson">Add Person</button>
         </div>
-        <div class="content-right">
-            <h2>Current Jafflers</h2>
+        <div class="neumorphic content-right">
+            <h2 style="margin-bottom: 1rem;">Current</h2>
             <ul class="list-jafflers" id="currentList">None</ul>
         </div>
     </section>
     <section class="jaffle-button-wrapper">
-        <button class="jaffle-button" id="jaffle">Find Winner</button>
-        <button class="jaffle-button clear" id="clearJafflers">Reset Jaffle</button>
+        <button class="neumorphic jaffle-button small" id="addPerson">Add Person</button>
+        <button class="neumorphic jaffle-button" id="jaffle">Find Winner</button>
+        <button class="neumorphic jaffle-button clear" id="clearJafflers">Reset Jaffle</button>
     </section>
     <section class="jaffle-winner" id="jaffleWinner"></section>
     <script>
@@ -272,7 +326,7 @@
                     enableAllInputs();
                 }
                 else {
-                    jaffleWinnerElement.innerHTML = `<p style='font-size:22px'>Please add jafflers to win.</p>`;
+                    jaffleWinnerElement.innerHTML = `<p>Please add jafflers to win.</p>`;
                 }
             }
             const updateJafflerDisplay = () => {
@@ -286,6 +340,7 @@
                     let raffleLabel = document.createElement("label");
                     raffleLabel.innerHTML = `<i class="fas fa-ticket-alt" style="margin-right:0.5rem;" aria-hidden="true"></i>`;
                     raffleLabel.for = "jafflerAmount";
+                    raffleLabel.classList = "no-right-margin";
                     let raffleElement = document.createElement("input");
                     raffleElement.type = "number";
                     raffleElement.name = "jaffleAmount";
